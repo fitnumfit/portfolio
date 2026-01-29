@@ -17,6 +17,31 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      // Close menu if clicking outside the nav or on the overlay background
+      if (isMobileMenuOpen) {
+        const nav = target.closest('nav')
+        const overlay = target.closest('.mobile-menu-overlay')
+        if (!nav || (overlay && !target.closest('.mobile-menu-content'))) {
+          setIsMobileMenuOpen(false)
+        }
+      }
+    }
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = 'hidden'
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isMobileMenuOpen])
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
     if (element) {
@@ -26,13 +51,14 @@ export default function Navbar() {
   }
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-blue-100 dark:border-blue-500/30 shadow-md shadow-blue-500/5 dark:shadow-blue-500/20' 
-          : 'bg-transparent'
-      }`}
-    >
+    <>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled 
+            ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md shadow-blue-500/5 dark:shadow-blue-500/20' 
+            : 'bg-transparent'
+        }`}
+      >
       <div className="container-custom">
         <div className="flex items-center justify-center h-20 px-4 sm:px-6 lg:px-8">
           {/* Desktop Menu */}
@@ -100,8 +126,8 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden absolute right-4 sm:right-6 flex items-center gap-3">
+          {/* Mobile Theme Toggle - Left Side */}
+          <div className="md:hidden absolute left-4 sm:left-6">
             <button
               onClick={toggleTheme}
               className="relative p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
@@ -128,6 +154,10 @@ export default function Navbar() {
                 />
               </div>
             </button>
+          </div>
+
+          {/* Mobile Menu Button - Right Side */}
+          <div className="md:hidden absolute right-4 sm:right-6">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
@@ -137,70 +167,71 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-blue-100 dark:border-blue-500/30">
-            <div className="flex flex-col space-y-2 p-4">
-              {/* Theme Toggle in Mobile Menu */}
-              <button
-                onClick={toggleTheme}
-                className="flex items-center gap-3 text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-3 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                <div className="relative w-5 h-5">
-                  <FiSun 
-                    size={20} 
-                    className={`absolute inset-0 transition-all duration-300 ${
-                      theme === 'light' 
-                        ? 'rotate-0 scale-100 opacity-100' 
-                        : 'rotate-90 scale-0 opacity-0'
-                    }`}
-                  />
-                  <FiMoon 
-                    size={20} 
-                    className={`absolute inset-0 transition-all duration-300 ${
-                      theme === 'dark' 
-                        ? 'rotate-0 scale-100 opacity-100' 
-                        : '-rotate-90 scale-0 opacity-0'
-                    }`}
-                  />
-                </div>
-                <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
-              </button>
-              <button
-                onClick={() => scrollToSection('about')}
-                className="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-3 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                About
-              </button>
-              <button
-                onClick={() => scrollToSection('experience')}
-                className="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-3 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                Experience
-              </button>
-              <button
-                onClick={() => scrollToSection('skills')}
-                className="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-3 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                Skills
-              </button>
-              <button
-                onClick={() => scrollToSection('projects')}
-                className="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-3 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                Work Samples
-              </button>
-              <button
-                onClick={() => scrollToSection('contact')}
-                className="text-left bg-gradient-to-r from-blue-500 to-teal-500 text-white px-6 py-3 rounded-lg hover:from-blue-400 hover:to-teal-400 transition-all duration-300 mt-2"
-              >
-                Contact
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </nav>
+
+      {/* Mobile Menu Backdrop */}
+      <div
+        className={`md:hidden fixed inset-0 top-20 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ease-in-out ${
+          isMobileMenuOpen
+            ? 'opacity-100 visible'
+            : 'opacity-0 invisible'
+        }`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+
+      {/* Mobile Menu Drawer - Right to Left */}
+      <div
+        className={`mobile-menu-overlay md:hidden fixed top-20 right-0 h-[calc(100vh-5rem)] w-80 max-w-[85vw] z-50 transition-transform duration-300 ease-in-out ${
+          isMobileMenuOpen
+            ? 'translate-x-0'
+            : 'translate-x-full'
+        }`}
+      >
+        {/* Gradient Border Wrapper */}
+        <div className="relative h-full w-full">
+          {/* Gradient Border */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-teal-500 to-emerald-500 p-[2px] shadow-2xl shadow-blue-500/30">
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md h-full flex flex-col">
+              {/* Navigation Content */}
+              <div className="mobile-menu-content flex-1 overflow-y-auto">
+                <div className="flex flex-col space-y-2 p-6 pt-8">
+                  <button
+                    onClick={() => scrollToSection('about')}
+                    className="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95 text-base font-medium"
+                  >
+                    About
+                  </button>
+                  <button
+                    onClick={() => scrollToSection('experience')}
+                    className="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95 text-base font-medium"
+                  >
+                    Experience
+                  </button>
+                  <button
+                    onClick={() => scrollToSection('skills')}
+                    className="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95 text-base font-medium"
+                  >
+                    Skills
+                  </button>
+                  <button
+                    onClick={() => scrollToSection('projects')}
+                    className="text-left text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95 text-base font-medium"
+                  >
+                    Work Samples
+                  </button>
+                  <button
+                    onClick={() => scrollToSection('contact')}
+                    className="text-left bg-gradient-to-r from-blue-500 to-teal-500 text-white px-6 py-3 rounded-lg hover:from-blue-400 hover:to-teal-400 transition-all duration-300 mt-2 active:scale-95 shadow-md shadow-blue-500/20 text-base font-semibold"
+                  >
+                    Contact
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
