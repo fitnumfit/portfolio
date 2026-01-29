@@ -1,4 +1,4 @@
-# NUMA Portfolio - Healthcare SEO & Content Specialist
+# Portfolio - Healthcare SEO & Content Specialist
 
 A beautiful, modern portfolio website built with Next.js, React, and Tailwind CSS. This portfolio showcases healthcare SEO and content writing expertise with a focus on SEO optimization.
 

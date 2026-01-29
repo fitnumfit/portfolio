@@ -1,10 +1,24 @@
 export const portfolioConfig = {
   personal: {
     name: "Numa Sayyada",
+    firstName: "Numa",
+    lastName: "Sayyada",
     title: "Healthcare SEO & Growth Content Specialist",
     tagline: "52% Organic Traffic Growth | 100K Subscriber Scaling | 5+ Years Experience",
     email: "",
     linkedin: "https://www.linkedin.com/in/numa-sayyada-tarab-290033221/",
+  },
+
+  stats: {
+    trafficGrowth: "52%",
+    subscribers: "100K",
+    yearsExperience: "5+",
+    trafficGrowthLabel: "Organic Traffic Growth",
+    subscribersLabel: "Subscribers Scaled",
+    yearsExperienceLabel: "Years Experience",
+    trafficGrowthBadge: "52% Growth",
+    subscribersBadge: "100K+ Subscribers",
+    yearsExperienceBadge: "5+ Years Experience",
   },
 
   about: {
